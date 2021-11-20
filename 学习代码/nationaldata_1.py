@@ -70,12 +70,12 @@ if __name__ == '__main__':
 #2013年第一季度以来各省地区生产总值
   key={}
   key['m']='QueryData'
-  key['dbcode']='fsjd'
+  key['dbcode']='fsnd'
   key['rowcode']='reg'
   key['colcode']='sj'
-  key['wds']='[{"wdcode":"zb","valuecode":"A030001"}]'
+  key['wds']='[{"wdcode":"zb","valuecode":"A0G0701"}]'
   key['k1']=str(getTime()) 
-  key['dfwds']='[{"wdcode":"sj","valuecode":"2013A-"}]'
+  key['dfwds']='[{"wdcode":"sj","valuecode":"1996-"}]'
 
 
   # "wdcode":"zb" 选取左侧哪个条目,"wdcode":"sj"选项框中选取"最近6季度"
@@ -119,6 +119,6 @@ if __name__ == '__main__':
 
 
   print(df)
-  write = pd.ExcelWriter('./2013年第一季度居民人均可支配收入(元).xls') #该路径自己设置即可，没有该文件的话会自行创建一个，存在的话写入会覆盖原内容
+  write = pd.ExcelWriter('./1996~2020民用汽车拥有量（万辆）.xls') #该路径自己设置即可，没有该文件的话会自行创建一个，存在的话写入会覆盖原内容
   df.to_excel(write)
   write.save()
