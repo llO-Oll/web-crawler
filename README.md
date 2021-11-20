@@ -69,7 +69,7 @@ protocol :// hostname[:port] / path / [;parameters][?query]#fragment
 
    字符串，用于指定网络资源中的片断。例如一个网页中有多个名词解释，可使用fragment直接定位到某一名词解释。
 
-[URL格式_hhthwx的博客-CSDN博客_url](https://blog.csdn.net/hhthwx/article/details/78567961)
+[(22条消息) URL格式_hhthwx的博客-CSDN博客_url](https://blog.csdn.net/hhthwx/article/details/78567961)
 
 
 
@@ -82,5 +82,205 @@ protocol :// hostname[:port] / path / [;parameters][?query]#fragment
 
 ***
 
-## Scrapy
+# 政策爬虫（以国家发改委官网为例）
+
+------
+
+
+
+## 对异步输出网址爬虫的措施
+
+由于国家发改委的网站是**异步输出**，直接对网址的元素爬取结果为空，即政策信息为保存在用户访问的网址中，
+
+**异步传输**：通常数据传输有两种模式，同步传输和异步传输。同步传输是将一个数据块直接发送，这样呈现给我们的就是通常的静态网页，那么和为异步传输？异步传输是将数据分为一块一块的，不直接呈现一个完整的数据，
+
+我们需要查看网址的XHR
+
+![](https://i.loli.net/2021/11/19/CqfwMVmnyrQj1Te.png)
+
+我们可以看到有3个XHR，依次检查，我们点击每一项，在右侧相应中查看自己想要的信息，我们可以在第2个XHR中发现自己想要的信息，如下图所示：
+
+![image-20211119185604599](学习代码/图片/LHCEQ3cP6kRqZ7v.png)
+
+那么此时我们就发现了自己想要的信息，那么接下来我们点击消息头，在消息头中我们可以看到请求网址，那么这个网址就是包含政策信息的”真网址“。
+
+![image-20211119185737732](https://i.loli.net/2021/11/19/6mOCBM4hvbIZ9aQ.png)
+
+把之前访问的网站替换成消息头的url即可获取到政策信息。
+
+### 伪装头部信息和接入搜索接口
+
+```python
+url='https://fwfx.ndrc.gov.cn/api/query?qt=&tab=all&page='+str(i)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=dateDesc'
+headers={'User-Agent':'Mozilla/5.0(Windows;U;Windows NT6.1;en-US;rv:1.9.1.6) Geko/20091201 Firefox/3.5.6'}#浏览器代理
+```
+
+### 获取json格式的内容
+
+```python
+def get(url):
+    # 禁用安全请求警告
+    requests.packages.urllib3.disable_warnings()
+    # 发出请求，使用post方法，这里使用前面自定义的头部和参数
+    # verify=False，针对https协议,若不加该代码无法通过SSL验证
+    r = requests.post(url, headers=headers,verify=False)
+    # 使用json库中loads函数，将r.text字符串解析成dict字典格式存储于js中
+    js = json.loads(r.text)
+    # print(js)
+```
+
+### 分析网页结构
+
+![image-20211119190207310](https://i.loli.net/2021/11/19/xYGnR5Q2LXJCHor.png)
+
+通过层层剥离，最终可以获取目标信息，代码如下：
+
+```python
+def getList(length):
+    Titles=[]
+    urls=[]
+    for i in range(length):
+        Title = js['data']['resultList'][i]['dreTitle']
+        time = js['data']['resultList'][i]['docDate']
+        organization = js['data']['resultList'][i]['domainSiteName']
+        suburl = js['data']['resultList'][i]['url']
+        print(Title+time+organization+suburl)
+```
+
+### 获取每个政策的标题、时间、机构、链接
+
+```python
+def getList(length):
+    Titles=[]
+    urls=[]
+    for i in range(length):
+        Title = js['data']['resultList'][i]['dreTitle']
+        time = js['data']['resultList'][i]['docDate']
+        organization = js['data']['resultList'][i]['domainSiteName']
+        suburl = js['data']['resultList'][i]['url']
+        print(Title+time+organization+suburl)
+
+        Titles.append(Title)
+        urls.append(suburl)
+
+        return Titles,urls
+```
+
+### 爬取每个政策的子链接内容并保存成txt文档
+
+```python
+for i in range(len(urls)):
+    try: 
+        res = urllib.request.urlopen(urls[i])  
+        html = res.read().decode('utf-8') 
+        soup = BeautifulSoup(html, 'lxml')
+
+        print(str(i)+'saved')
+        for p in soup.select('p'):
+            t = p.get_text()
+            txt(Titles[i],t)
+            except OSError:
+                pass    
+            continue
+
+```
+
+```python
+picpath='./newws/'
+def txt(name, text): 
+    if not os.path.exists(picpath): 
+        os.makedirs(picpath)
+    savepath = picpath + name + '.txt'
+    file = open(savepath, 'a', encoding='utf-8')#因为一个网页里有多个标签p，所以用'a'添加模式
+    file.write(text)
+    # print(text)
+    file.close
+```
+
+### 完整代码
+
+```python
+import urllib.request
+import requests
+import time
+import json
+import numpy as np
+import pandas as pd
+from bs4 import BeautifulSoup  # 导入urllib库的request模块
+import lxml                    #文档解析器
+import os                      #os模块就是对操作系统进行操作
+
+
+
+
+def get(url):
+
+
+    # 禁用安全请求警告
+    requests.packages.urllib3.disable_warnings()
+
+    # 发出请求，使用post方法，这里使用前面自定义的头部和参数
+    # verify=False，国家统计局20年下半年改用https协议,若不加该代码无法通过SSL验证
+    r = requests.post(url, headers=headers,verify=False)
+
+    # 使用json库中loads函数，将r.text字符串解析成dict字典格式存储于js中
+    js = json.loads(r.text)
+    # print(js)
+
+# 数据预处理，获取json列表中层层包裹的strdata元素（数据）
+    def getList(length):
+        Titles=[]
+        urls=[]
+        for i in range(length):
+            Title = js['data']['resultList'][i]['dreTitle']
+            time = js['data']['resultList'][i]['docDate']
+            organization = js['data']['resultList'][i]['domainSiteName']
+            suburl = js['data']['resultList'][i]['url']
+            print(Title+time+organization+suburl)
+
+            Titles.append(Title)
+            urls.append(suburl)
+
+        return Titles,urls
+
+
+    length=len(js['data']['resultList'])
+    Titles,urls=getList(length)
+
+
+
+
+    for i in range(len(urls)):
+        try: 
+            res = urllib.request.urlopen(urls[i])  
+            html = res.read().decode('utf-8') 
+            soup = BeautifulSoup(html, 'lxml')
+
+            print(str(i)+'saved')
+            for p in soup.select('p'):
+                t = p.get_text()
+                txt(Titles[i],t)
+        except OSError:
+            pass    #如果报错就不管，继续读取下一个url
+        continue
+    
+#定义txt存储路径。
+picpath='./newws/'#这里我用的是本程序路径，也可改为c盘或d盘等路径。
+def txt(name, text):  # 定义函数名
+    if not os.path.exists(picpath):  # 路径不存在时创建一个
+        os.makedirs(picpath)
+    savepath = picpath + name + '.txt'
+    file = open(savepath, 'a', encoding='utf-8')#因为一个网页里有多个标签p，所以用'a'添加模式
+    file.write(text)
+    # print(text)
+    file.close
+if __name__ == '__main__':
+    for i in range(5):
+        url='https://fwfx.ndrc.gov.cn/api/query?qt=&tab=all&page='+str(i)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=dateDesc'
+        headers={'User-Agent':'Mozilla/5.0(Windows;U;Windows NT6.1;en-US;rv:1.9.1.6) Geko/20091201 Firefox/3.5.6'}#浏览器代理
+        get(url)
+
+
+
+```
 
