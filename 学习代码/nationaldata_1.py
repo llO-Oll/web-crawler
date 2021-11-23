@@ -85,4 +85,3 @@ if __name__ == '__main__':
         headers={'User-Agent':'Mozilla/5.0(Windows;U;Windows NT6.1;en-US;rv:1.9.1.6) Geko/20091201 Firefox/3.5.6'}#浏览器代理
         get(url)
 
-
