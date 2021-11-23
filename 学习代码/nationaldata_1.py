@@ -57,7 +57,12 @@ def get(url):
             print(str(i)+'saved')
             for p in soup.select('p'):
                 t = p.get_text()
+                t.replace(' ','\r\n')
                 txt(Titles[i],t)
+            for span in soup.select('span'):
+                t = span.get_text()
+                t.replace(' ','\r\n')
+                txt(Titles[i],t)                
         except OSError:
             pass    #如果报错就不管，继续读取下一个url
         continue
@@ -69,7 +74,9 @@ def txt(name, text):  # 定义函数名
         os.makedirs(picpath)
     savepath = picpath + name + '.txt'
     file = open(savepath, 'a', encoding='utf-8')#因为一个网页里有多个标签p，所以用'a'添加模式
+
     file.write(text)
+    file.write('\r')
     # print(text)
     file.close
 if __name__ == '__main__':
