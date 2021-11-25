@@ -59,9 +59,19 @@ def get(url):
             print(str(i)+'saved')
             t=''
             for p in soup.select('p'):
+<<<<<<< HEAD
                 temp = p.get_text()
                 t =t+temp
             txt(Titles[i],times[i],t)
+=======
+                t = p.get_text()
+                t.replace(' ','\r\n')
+                txt(Titles[i],t)
+            for span in soup.select('span'):
+                t = span.get_text()
+                t.replace(' ','\r\n')
+                txt(Titles[i],t)                
+>>>>>>> 7955d57bbeff9c80f52b0da94b0dd9a7356b93c4
         except OSError:
             pass    #如果报错就不管，继续读取下一个url
         continue
@@ -74,9 +84,14 @@ def txt(name,time, text):  # 定义函数名
     savepath = picpath+'国家发改委 '+time +' '+name+ '.txt'
     num=num+1
     file = open(savepath, 'a', encoding='utf-8')#因为一个网页里有多个标签p，所以用'a'添加模式
+<<<<<<< HEAD
     file.write(name)
     file.write('\r\n')
+=======
+
+>>>>>>> 7955d57bbeff9c80f52b0da94b0dd9a7356b93c4
     file.write(text)
+    file.write('\r')
     # print(text)
     file.close
 if __name__ == '__main__':
