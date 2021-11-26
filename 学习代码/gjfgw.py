@@ -39,6 +39,9 @@ def getList(js,length):
         count=count+1
         print(str(count)+Title+time+organization+suburl)
         if 'pdf' not in suburl:
+            Title.replace("<em>","")
+            Title.replace("</em>","")
+            print(Title)
             Titles.append(Title)
             urls.append(suburl)
             times.append(time)
@@ -79,8 +82,8 @@ def txt(name,time, text):  # 定义函数名
     file.close
 
 if __name__ == '__main__':
-    for i in range(25):
-        url='https://fwfx.ndrc.gov.cn/api/query?qt=%E7%94%B5%E5%8A%9B&tab=all&page='+str(i)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=dateDesc'
+    for i in range(20):
+        url='https://fwfx.ndrc.gov.cn/api/query?qt=%E7%94%B5%E5%8A%9B&tab=all&page='+str(num)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=weight'
         headers={'User-Agent':'Mozilla/5.0(Windows;U;Windows NT6.1;en-US;rv:1.9.1.6) Geko/20091201 Firefox/3.5.6'}#浏览器代理
         js,length=get(url,headers)
         getList(js,length)
