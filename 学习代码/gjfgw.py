@@ -1,4 +1,3 @@
-
 import urllib.request
 import requests
 import time
@@ -9,6 +8,7 @@ from bs4 import BeautifulSoup  # 导入urllib库的request模块
 import lxml                    #文档解析器
 import os                      #os模块就是对操作系统进行操作
 
+import re
 count = 0
 def get(url,headers):
 
@@ -30,6 +30,7 @@ def getList(js,length):
     Titles=[]
     urls=[]
     times=[]
+    zctypes=[]
     global count
     for i in range(length):
         Title = js['data']['resultList'][i]['dreTitle']
@@ -38,10 +39,7 @@ def getList(js,length):
         suburl = js['data']['resultList'][i]['url']
         count=count+1
         print(str(count)+Title+time+organization+suburl)
-        if 'pdf' not in suburl:
-            Title.replace("<em>","")
-            Title.replace("</em>","")
-            print(Title)
+        if 'pdf' not in suburl and 'zcfb' in suburl:
             Titles.append(Title)
             urls.append(suburl)
             times.append(time)
@@ -59,6 +57,18 @@ def getList(js,length):
                 temp = p.get_text()
                 t =t+temp
             txt(Titles[i],times[i],t)
+            fatherurl =re.match('https://www.ndrc.gov.cn/xxgk/zcfb/(.*)/',urls[i] )
+            if 'gg' in fatherurl.group():
+                for p in soup.select('p'):
+                    temp = p.get_text()
+                    t =t+'\r'+temp
+                txt(Titles[i],times[i],t)
+            else:
+                soup.find_all('')
+                for p in soup.select('span'):
+                    temp = p.get_text()
+                    t =t+'\r'+temp
+                txt(Titles[i],times[i],t)
         except OSError:
             pass    #如果报错就不管，继续读取下一个url
         continue
@@ -77,13 +87,40 @@ def txt(name,time, text):  # 定义函数名
     file.write('\r')
     file.write('国家发改委')
     file.write('\r')
+    # text=text.replace('  ','\r')
     file.write(text)
     # print(text)
     file.close
 
+# class Policies():
+#     def Policytz(self):
+#         f = fatherurl+'tz'
+#         return f
+#     def Policygh(self):
+#         f = fatherurl+'ghwb'
+#         return f
+#     def Policygf(self):
+#         f = fatherurl+'ghxwj'
+#         return f
+#     def Policygg(self):
+#         f = fatherurl+'gg'
+#         return f    
+#     def Policyfz(self):
+#         f = fatherurl+'fzggwl'
+#         return f
+#     # def Default(self):
+#     #     return "Invalid type"
+#     def getPolicy(self, policy):
+
+
+#         policy_name = "Policy" + str(policy)
+
+#         fun = getattr(self, policy_name, self.Default)
+#         return fun()
+
 if __name__ == '__main__':
-    for i in range(20):
-        url='https://fwfx.ndrc.gov.cn/api/query?qt=%E7%94%B5%E5%8A%9B&tab=all&page='+str(num)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=weight'
+    for i in range(25):
+        url='https://fwfx.ndrc.gov.cn/api/query?qt=%E7%94%B5%E5%8A%9B&tab=all&page='+str(i)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=dateDesc'
         headers={'User-Agent':'Mozilla/5.0(Windows;U;Windows NT6.1;en-US;rv:1.9.1.6) Geko/20091201 Firefox/3.5.6'}#浏览器代理
         js,length=get(url,headers)
         getList(js,length)
