@@ -53,7 +53,7 @@ def getList(js,length):
             soup = BeautifulSoup(html, 'lxml')            
             t=''
             fatherurl =re.match('https://www.ndrc.gov.cn/xxgk/zcfb/(.*)/',urls[i] )     #匹配根网址，附件url=根+子级url
-            if 'gg' in fatherurl.group():
+            if 'tz' in fatherurl.group():
                 for p in soup.select('p'):
                     temp = p.get_text()
                     t =t+'\r'+temp
