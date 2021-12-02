@@ -1,8 +1,6 @@
 # 网络爬虫
 
-当我们在浏览器中输入一个url后回车，后台会发生什么？比如说你输入http://www.lining0806.com/，你就会看到宁哥的小站首页。
-
-简单来说这段过程发生了以下四个步骤：
+简单来说爬虫过程发生了以下四个步骤：
 
 - 查找域名对应的IP地址。
 - 向IP对应的服务器发送请求。
@@ -79,6 +77,57 @@ protocol :// hostname[:port] / path / [;parameters][?query]#fragment
 - **POST** - 向指定的资源提交要被处理的数据。
 
 [GET 和 POST 到底有什么区别？ - 知乎 (zhihu.com)](https://www.zhihu.com/question/28586791)
+
+## Xpath
+
+XPath 使用路径表达式来选取 XML 文档中的节点或者节点集。这些路径表达式和我们在常规的电脑文件系统中看到的表达式非常相似。
+
+### 节点
+
+七种类型节点：元素、属性、文本、命名空间、处理指令、注释以及文档根节点。XML文档是被作为节点树来对待的。
+
+```html
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<bookstore>
+
+<book>
+  <title lang="en">Harry Potter</title>
+  <author>J K. Rowling</author> 
+  <year>2005</year>
+  <price>29.99</price>
+</book>
+
+</bookstore>
+```
+
+```html
+<bookstore> （文档节点）
+<author>J K. Rowling</author> （元素节点）
+lang="en" （属性节点） 
+```
+
+### 节点
+
+| 表达式   | 描述                                                       |
+| :------- | :--------------------------------------------------------- |
+| nodename | 选取此节点的所有子节点。                                   |
+| /        | 从根节点选取。                                             |
+| //       | 从匹配选择的当前节点选择文档中的节点，而不考虑它们的位置。 |
+| .        | 选取当前节点。                                             |
+| ..       | 选取当前节点的父节点。                                     |
+| @        | 选取属性。                                                 |
+
+| 路径表达式      | 结果                                                         |
+| --------------- | ------------------------------------------------------------ |
+| bookstore       | 选取bookstore元素的所有子节点。                              |
+| /bookstore      | 选取根元素bookstore。                                        |
+| bookstore/book  | 选取属于 bookstore 的子元素的所有 book 元素。                |
+| //book          | 选取所有 book 子元素，而不管它们在文档中的位置。             |
+| bookstore//book | 选择属于 bookstore 元素的后代的所有 book 元素，而不管它们位于 bookstore 之下的什么位置。 |
+| //@lang         | 选取名为 lang 的所有属性。                                   |
+
+
 
 ***
 
