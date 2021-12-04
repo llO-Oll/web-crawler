@@ -36,9 +36,9 @@ def get(url,headers):
             selector = etree.HTML(html)  
             links = selector.xpath('//div[@class="article-content"]/table[4]//text()')
             print(links)
-            for t in links:
+            # for t in links:
 
-                txt(titles[i],times[i],t)
+            #     txt(titles[i],times[i],t)
             
 
         except OSError:
