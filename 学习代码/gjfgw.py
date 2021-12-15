@@ -36,7 +36,7 @@ def getList(js,length):
         organization = js['data']['resultList'][i]['domainSiteName']    #机构
         suburl = js['data']['resultList'][i]['url']                     #二级网址    
 
-        if 'pdf' not in suburl and 'zcfb' in suburl:        # 判断二级网址是否是pdf，如果不是将政策信息添加到list中
+        if 'pdf' not in suburl:        # 判断二级网址是否是pdf，如果不是将政策信息添加到list中
             count=count+1
             Title=Title.replace('<em>','')
             Title=Title.replace('</em>','')    #剔除由关键字搜索产生的'<em>关键词</em>'   
@@ -52,16 +52,22 @@ def getList(js,length):
             html = res.read().decode('utf-8') 
             soup = BeautifulSoup(html, 'lxml')            
             t=''
+            temp=''
             fatherurl =re.match('https://www.ndrc.gov.cn/xxgk/zcfb/(.*)/',urls[i] )     #匹配根网址，附件url=根+子级url
-            if 'tz' in fatherurl.group():
-                for p in soup.select('p'):
-                    temp = p.get_text()
-                    t =t+'\r'+temp
+            # if 'tz' in fatherurl.group():
+            p_lables = soup.select('p')
+            span_lables = soup.select('span')
+            if(len(p_lables)> len(span_lables)):
+                for p in p_lables:
+                    if p.get_text()!=temp:
+                        temp = p.get_text()
+                        t =t+'\r'+temp
                 txt(Titles[i],times[i],t)
             else:
-                for p in soup.select('span'):
-                    temp = p.get_text()
-                    t =t+'\r'+temp
+                for span in span_lables:
+                    if span.get_text()!=temp:
+                        temp = span.get_text()
+                        t =t+'\r'+temp
                 txt(Titles[i],times[i],t)
             
 
@@ -125,8 +131,15 @@ def txt(name,time, text):
 
 
 if __name__ == '__main__':
-    for i in range(25):
-        url='https://fwfx.ndrc.gov.cn/api/query?qt=%E7%94%B5%E5%8A%9B&tab=all&page='+str(i)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=weight'
+    for i in range(1,3):
+        #关键字：电力
+        #url='https://fwfx.ndrc.gov.cn/api/query?qt=%E7%94%B5%E5%8A%9B&tab=all&page='+str(i)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=weight'
+        #关键字：碳中和
+        #url='https://fwfx.ndrc.gov.cn/api/query?qt=%E7%A2%B3%E4%B8%AD%E5%92%8C&tab=all&page='+str(i)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=weight'
+        #关键字：碳达峰
+        url='https://fwfx.ndrc.gov.cn/api/query?qt=%E7%A2%B3%E8%BE%BE%E5%B3%B0&tab=all&page='+str(i)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=weight'
+        #关键字：中部崛起
+        url='https://fwfx.ndrc.gov.cn/api/query?qt=%E4%B8%AD%E9%83%A8%E5%B4%9B%E8%B5%B7&tab=all&page='+str(i)+'&pageSize=20&siteCode=bm04000fgk&key=CAB549A94CF659904A7D6B0E8FC8A7E9&startDateStr=&endDateStr=&timeOption=0&sort=weight'
         headers={'User-Agent':'Mozilla/5.0(Windows;U;Windows NT6.1;en-US;rv:1.9.1.6) Geko/20091201 Firefox/3.5.6'}#浏览器代理
         js,length=get(url,headers)
         getList(js,length)
