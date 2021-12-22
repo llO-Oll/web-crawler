@@ -11,6 +11,7 @@ def getTime():
 
 url='http://data.stats.gov.cn/easyquery.htm?cn=A01'
 headers={'User-Agent':'Mozilla/5.0(Windows;U;Windows NT6.1;en-US;rv:1.9.1.6) Geko/20091201 Firefox/3.5.6'}#浏览器代理
+
 key={}#参数键值对
 key['m']='QueryData'
 key['dbcode']='fsnd'

@@ -9,6 +9,7 @@ import lxml
 import os                      
 from tqdm import tqdm
 import re
+from model.model import BaiduModel
 count = 0
 def get(url,headers):   
     requests.packages.urllib3.disable_warnings()    # 禁用安全请求警告
