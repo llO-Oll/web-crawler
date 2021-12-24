@@ -1,1 +1,1 @@
-}
+txt(file1,name,data, text1)

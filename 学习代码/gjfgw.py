@@ -74,6 +74,7 @@ def getList(js,length):
             #     txt(Titles[i],times[i],t)
             t=t.replace("　",'\n')                      #解码后的空字符，不是空格，段落标志
             t=t.replace("    ",'\n')                    #解码后的空字符，不是空格，段落标志
+            t=t.replace("　　",'\n')
             txt(Titles[i],times[i],t)
 
             #是否存在pdf附件,存在获取url并下载

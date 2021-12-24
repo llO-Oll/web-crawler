@@ -5,8 +5,8 @@ import os
 import time
 import json
 text=''
-filepath='F:/国家发改委四类政策/国家发改委电力政策_摘要/'
-path = 'F:/国家发改委四类政策/国家发改委电力政策/'
+filepath='F:/国家发改委四类政策/能源局政策_摘要/'
+path = 'F:/国家发改委四类政策/能源局政策/'
 
 model = BaiduModel()
 def txt(filename,name,time, text):  
